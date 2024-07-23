@@ -15,10 +15,9 @@ pmass = 1.67*10^-27; % (kg) proton mass
 mu_0 = 4*pi*10^-7; % (H/m) vacuum permeability
 emass = 9.109 * 10^-31; % (kg) electron mass
 q = -1.602*10^-19; % (C) electron charge
-flowspeed = 450 *10^3; % (m/s) speed of solar wind
+flowspeed = 400 *10^3; % (m/s) speed of solar wind
 kb = 1.38*10^-23; % (JK-1) Boltzmann's constant
-gamma = 1; % (dimensionless) used in sonic mach number calculation
-eV = 30; % (eV) electron volt temperature read by V2 (pg 3 of Zhang et al 1991)
+gamma = 5/3; % (dimensionless) used in sonic mach number calculation
 
 %% Define the parameters to change each run.
 
@@ -61,7 +60,7 @@ for hp = 1:length(planets)
 
                             % Uranus specific constants
                             rotperiod = 17.23*3600;
-                            R_U = 25362; % (km) radius of Uranus
+                            R = 25362; % (km) radius of Uranus
                             MP = 20; % magnetopause standoff distance in planetary radii
                             BS = 23.7; % bowshock standoff distance in planetary radii
                             limitplotting = 68; % V2 exited Uranus magnetosphere at 68 RU
@@ -69,6 +68,7 @@ for hp = 1:length(planets)
                             density_sw = 0.03 * 10^6; % (1/m^3)
                             density_sw = density_sw * pmass; % (kg/m^3)
                             raxis = 97.8; % Tilt of Uranus' rotation axis
+                            MS = 27; % Sonic Mach number
 
                         elseif planets(hp)==1
                             planet =1;
@@ -76,7 +76,7 @@ for hp = 1:length(planets)
 
                             % Neptune specific constants
                             rotperiod = 16.1*3600;
-                            R_N = 24622; % (km) radius of Neptune
+                            R = 24622; % (km) radius of Neptune
                             MP = 26; % magnetopause standoff distance in planetary radii
                             BS = 34.9; % bowshock standoff distance in planetary radii
                             limitplotting = 60; % V2 exited neptune magnetosphere at 60 RN
@@ -84,6 +84,7 @@ for hp = 1:length(planets)
                             density_sw = 0.025 * 10^6; % (1/m^3)
                             density_sw = density_sw * pmass; % (kg/m^3)
                             raxis = -28.3; % Tilt of Neptune's rotation axis
+                            MS = 28; % Sonic Mach number
                         end
 
                         % Wave number k being used.
@@ -322,7 +323,7 @@ for hp = 1:length(planets)
                                     % compute rigid corotational velocity
                                     r(i,j,k) = sqrt(xgs(i,j,k)^2 + ygs(i,j,k)^2 + zgs(i,j,k)^2);
                                     if grid(i,j,k) == 0 % if magnetosphere
-                                        mag_v(i,j,k) = w*r(i,j,k)*R_U*10^3; % (m/s) because each grid point is 1 RN
+                                        mag_v(i,j,k) = w*r(i,j,k)*R*10^3; % (m/s) because each grid point is 1 RN
                                     end
 
                                     % reduce corotational plasma based on Cassini data from Wilson et al. (2009)
@@ -340,12 +341,6 @@ for hp = 1:length(planets)
                         psi = zeros(n,n);
                         sw_v = zeros(n,n);
 
-                        T = (eV * 1.602 *10^-19)/kb; % (K) convert eV to energy by multiplying to put it in joules and then divide by kb to get kelvin
-
-                        % calculate sonic Mach number
-                        cs = sqrt(gamma*kb*T/pmass);
-                        MS = flowspeed/cs;
-
                         % calculate psi angle
                         for i = 1:n
                             for j = 1:n
@@ -359,6 +354,10 @@ for hp = 1:length(planets)
 
                             end
                         end
+
+                        % Produce Figure 3
+                        % figure
+                        % imagesc(sw_v)
 
                         %% Assign 3D density and magnetic field values to the 2D paraboloid surface
 
@@ -441,6 +440,10 @@ for hp = 1:length(planets)
                         end
 
                         rightside(isinf(rightside)) = 10e20; % set any values that are infinity to this high number
+                        
+                        % Produce plots in Figure 8
+                        % figure
+                        % imagesc(kdotb2)
 
                         %% Assign 3D velocity values to 2D paraboloid surface
                         % initialize matrices
